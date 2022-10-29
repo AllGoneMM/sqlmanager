@@ -1,7 +1,6 @@
-import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.List;
-import java.lang.Class;
+import java.util.function.Function;
 
 public class SqlManager {
     private String url;
@@ -26,7 +25,8 @@ public class SqlManager {
         return affectedRows;
     }
 
-    public int executeUpdate(String sqlQuery, List<Object> type) {
+    public <T> int executeUpdate(String sqlQuery,
+                                 List<T> type) {
         int affectedRows = 0;
         try (Connection connection = DriverManager.getConnection(this.url, this.username, this.password)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
@@ -41,10 +41,48 @@ public class SqlManager {
         return affectedRows;
     }
 
-//    public void execute(String sqlQuery){
+
+
+    public <T> List<T> executeQuery(String sqlQuery,
+                                    Function<ResultSet, List<T>> modelProcessor) {
+        List<T> result = null;
+        ResultSet resultSet;
+        try (Connection connection = DriverManager.getConnection(this.url, this.username, this.password)) {
+            try (Statement statement = connection.createStatement()) {
+                resultSet = statement.executeQuery(sqlQuery);
+                result = modelProcessor.apply(resultSet);
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return result;
+    }
+
+    public <T> List<T> executeQuery(String sqlQuery,
+                                    List<Object> type,
+                                    Function<ResultSet, List<T>> modelProcessor) {
+        List<T> result = null;
+        ResultSet resultSet;
+        try (Connection connection = DriverManager.getConnection(this.url, this.username, this.password)) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+                for (int i = 0; i < type.size(); i++) {
+                    preparedStatement.setObject(i + 1, type.get(i));
+                }
+                resultSet = preparedStatement.executeQuery();
+                result = modelProcessor.apply(resultSet);
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return result;
+    }
+//    public List<Object> execute(String sqlQuery){
 //        try (Connection connection = DriverManager.getConnection(url, username, password)) {
 //            try (Statement statement = connection.createStatement()) {
-//                statement.executeUpdate(sqlQuery);
+//                if(statement.execute(sqlQuery)){
+//                    return statement.getResultSet();
+//                }
+//                if(statement.getMoreResults())
 //            }
 //        } catch (SQLException e) {
 //            System.err.println(e.getMessage());
