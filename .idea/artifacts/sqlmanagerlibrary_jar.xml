@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="sqlmanagerlibrary:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/sqlmanagerlibrary_jar</output-path>
-    <root id="archive" name="sqlmanagerlibrary.jar">
-      <element id="module-output" name="sqlmanagerlibrary" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Program Files/MySQL/Connector J/mysql-connector-j-8.0.31.jar" path-in-jar="/" />
-    </root>
-  </artifact>
-</component>
