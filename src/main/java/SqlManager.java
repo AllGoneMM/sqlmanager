@@ -1,4 +1,7 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.function.Function;
@@ -27,7 +30,7 @@ public class SqlManager {
                         String partialRead = new String(dataFromFile, 0, readCharsCount);
                         allFileContent.append(partialRead);
                     }
-                    queryString = allFileContent.toString().replaceAll("--\s.*\n|#.*\n|/[*].*[*]/","").split(";");
+                    queryString = allFileContent.toString().replaceAll("--\s.*\n|#.*\n|/[*].*[*]/", "").split(";");
                 }
             }
         } catch (IOException e) {
