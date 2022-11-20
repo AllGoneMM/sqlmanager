@@ -1,3 +1,5 @@
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.function.Function;
 
@@ -10,6 +12,28 @@ public class SqlManager {
         this.url = url;
         this.username = username;
         this.password = password;
+    }
+
+    public static String[] getQueryString(String scriptPath) throws IOException {
+        String[] queryString;
+        try (FileInputStream fileInputStream = new FileInputStream(scriptPath)) {
+            try (InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8)) {
+                try (BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                    StringBuilder allFileContent = new StringBuilder();
+                    final int dataLength = 2048;
+                    char[] dataFromFile = new char[dataLength];
+                    int readCharsCount;
+                    while ((readCharsCount = bufferedReader.read(dataFromFile, 0, dataLength)) != -1) {
+                        String partialRead = new String(dataFromFile, 0, readCharsCount);
+                        allFileContent.append(partialRead);
+                    }
+                    queryString = allFileContent.toString().replaceAll("--\s.*\n|#.*\n|/[*].*[*]/","").split(";");
+                }
+            }
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
+        return queryString;
     }
 
     @SafeVarargs
